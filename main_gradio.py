@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import argparse
 import gradio as gr
 import os
@@ -17,8 +16,6 @@ parser.add_argument("--top_k", default=3, type=int, help="Return top k relevant 
 parser.add_argument("--qa_max_new_tokens", default=128, type=int, help="Number of max new tokens for llm")
 # general arguments
 parser.add_argument("--port", type=int, default=8899, help="Gradio server port")
-parser.add_argument("--lid", default="en", choices=['en', 'zh'],
-                    help="which language do you want use during conversation")
 
 args = parser.parse_args()
 print(args)
@@ -27,9 +24,7 @@ vchat = VChat(args)
 vchat.init_model()
 
 global_chat_history = []
-global_lid = args.lid
 global_en_log_result = ""
-global_zh_log_result = ""
 
 
 def clean_conversation():
@@ -46,39 +41,26 @@ def clean_chat_history():
     return '', None
 
 
-def submit_message(message, lid):
-    chat_history, generated_question, source_documents = vchat.chat2video(message, lid)
+def submit_message(message):
+    chat_history, generated_question, source_documents = vchat.chat2video(message)
     global_chat_history.append((message, chat_history[0][1]))
     return '', global_chat_history
 
 
-def log_fn(vid_path, lid):
+def log_fn(vid_path):
     print(vid_path)
     global global_en_log_result
-    global global_zh_log_result
     if vid_path is None:
-        log_text = "====== Please upload video or provide bilibili_BVid 🙃====="
+        log_text = "===== Please upload video! ====="
         gr.update(value=log_text, visible=True)
     else:
-        global_en_log_result, global_zh_log_result = vchat.video2log(vid_path)
-        if lid == "en":
-            return gr.update(value=global_en_log_result, visible=True)
-        elif lid == "zh":
-            return gr.update(value=global_zh_log_result, visible=True)
+        global_en_log_result = vchat.video2log(vid_path)
+        return gr.update(value=global_en_log_result, visible=True)
+        
 
-
-def lid_change(lid):
-    global global_chat_history
-    vchat.clean_history()
-    global_chat_history = []
-    print(f"\033[31;1mChange to {lid}\033[0m")
-    if lid == "en":
-        global global_en_log_result
-        return gr.update(value=global_en_log_result, visible=True), '', None
-    elif lid == "zh":
-        global global_zh_log_result
-        return gr.update(value=global_zh_log_result, visible=True), '', None
-
+def download_file():
+    with open("en_log_result.txt", "w") as file:
+        file.write(global_en_log_result)
 
 css = """
       #col-container {max-width: 80%; margin-left: auto; margin-right: auto;}
@@ -94,31 +76,38 @@ with gr.Blocks(css=css) as demo:
         gr.Markdown("""## 🤖SumMeeting Bot
                     Powered by BigDL, Llama, Whisper, Helsinki and LangChain/log""",
                     elem_id="header")
-        lid_choice = gr.Dropdown(choices=["en", "zh"], value="en", label="Choose language")
+        
+
+        with gr.Column() as advanced_column:
+            max_new_tokens = gr.Slider(label="Max new tokens", minimum=1, maximum=1024, step=1, value=128)
+            temperature = gr.Slider(label="Temperature", minimum=0.1, maximum=1.0, step=0.1, value=1.0)
+            top_p = gr.Slider(label="Top-p (nucleus sampling)", minimum=0.05, maximum=1.0, step=0.05, value=0.95)
+            top_k = gr.Slider(label="Top-k", minimum=1, maximum=50, step=1, value=3)
 
         with gr.Row():
             with gr.Column():
                 video_inp = gr.Video(label="video_input")
                 log_btn = gr.Button("Generate Video Document")
-                log_outp = gr.Textbox(label="Document output\nPlease be patient", lines=10)
-                total_tokens_str = gr.Markdown(elem_id="total_tokens_str")
+                log_outp = gr.Textbox(label="Summary Preview", lines=15)
+                btn_download = gr.Button("Download File")
+                # total_tokens_str = gr.Markdown(elem_id="total_tokens_str")
 
             with gr.Column():
-                chatbot = gr.Chatbot(elem_id="chatbox")
+                chatbot = gr.Chatbot(elem_id="chatbox", height=600)
                 input_message = gr.Textbox(show_label=False, placeholder="Enter text and press enter",
                                            visible=True).style(container=False)
                 btn_submit = gr.Button("Submit")
                 with gr.Row():
                     btn_clean_chat_history = gr.Button("Clean Chat History")
-                    btn_clean_conversation = gr.Button("🔃 Start New Conversation")
-    # lid_choice 是一个下拉菜单控件，用于选择语言
-    lid_choice.change(lid_change, [lid_choice], [log_outp, input_message, chatbot])
-    # 用户可以在输入框 input_message 中输入文本f，并通过点击按钮 btn_submit 或按下回车键来提交消息
-    btn_submit.click(submit_message, [input_message, lid_choice], [input_message, chatbot])
-    input_message.submit(submit_message, [input_message, lid_choice], [input_message, chatbot])
+                    btn_clean_conversation = gr.Button("Start New Summary")
+
+    btn_submit.click(submit_message, [input_message, max_new_tokens, temperature, top_p, top_k],
+                     [input_message, chatbot])
+    input_message.submit(submit_message, [input_message], [input_message, chatbot])
     btn_clean_conversation.click(clean_conversation, [], [input_message, video_inp, chatbot, log_outp])
     btn_clean_chat_history.click(clean_chat_history, [], [input_message, chatbot])
-    log_btn.click(log_fn, [video_inp, lid_choice], [log_outp])
+    log_btn.click(log_fn, [video_inp], [log_outp])
+    btn_download.click(download_file, [])
 
     demo.load(queur=False)
 

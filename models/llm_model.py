@@ -6,8 +6,6 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import CharacterTextSplitter
 from bigdl.llm.langchain.embeddings import TransformersEmbeddings
 from langchain import LLMChain
-
-from models.helsinki_model import Translator
 from utils.utils import new_cd
 
 parent_dir = os.path.dirname(__file__)
@@ -52,10 +50,10 @@ class LlmReasoner():
 
     def init_model(self):
         with new_cd(parent_dir):
-            self.llm = TransformersLLM.from_model_id_low_bit(f"D:\\Mcs\\5014\\llm\\models\\{self.llm_version}")
+            self.llm = TransformersLLM.from_model_id_low_bit(f"../checkpoints/{self.llm_version}")
             self.llm.streaming = False
             self.embeddings = TransformersEmbeddings.from_model_id(
-                model_id=f"D:\\Mcs\\5014\\llm\\models\\{self.embed_version}")
+                model_id=f"../checkpoints/{self.embed_version}")
         self.question_generator = LLMChain(llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT)
         self.answer_generator = LLMChain(llm=self.llm, prompt=QA_PROMPT,
                                          llm_kwargs={"max_new_tokens": self.qa_max_new_tokens})
