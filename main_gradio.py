@@ -3,7 +3,7 @@ import argparse
 import gradio as gr
 import os
 from models.vchat_bigdl import VChat
-from models.sum_model import summarize
+from models.sum_model import Sum
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 parser = argparse.ArgumentParser()
@@ -22,6 +22,7 @@ args = parser.parse_args()
 print(args)
 
 vchat = VChat(args)
+sumbot = Sum(args)
 vchat.init_model()
 
 global_chat_history = []
@@ -79,7 +80,7 @@ def download_sum_file():
 
 def summary():
     global global_summary
-    global_summary = summarize(global_en_log_result)
+    global_summary = sumbot.summarize(global_en_log_result)
     return gr.update(value=global_summary, visible=True)
 
 
@@ -101,8 +102,10 @@ with gr.Blocks(css=css) as demo:
         with gr.Column() as advanced_column:
             max_new_tokens = gr.Slider(label="Max new tokens", minimum=1, maximum=1024, step=1, value=128)
             # temperature = gr.Slider(label="Temperature", minimum=0.1, maximum=1.0, step=0.1, value=1.0)
-            top_p = gr.Slider(label="Top-p (nucleus sampling)", minimum=0.05, maximum=1.0, step=0.05, value=0.95)
+            # top_p = gr.Slider(label="Top-p (nucleus sampling)", minimum=0.05, maximum=1.0, step=0.05, value=0.95)
             top_k = gr.Slider(label="Top-k", minimum=1, maximum=50, step=1, value=3)
+
+
             args.qa_max_new_tokens = max_new_tokens
             args.top_k = top_k
 
