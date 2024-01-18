@@ -34,7 +34,8 @@ def clean_conversation():
     global global_chat_history
     vchat.clean_history()
     global_chat_history = []
-    return '', gr.update(value=None, interactive=True), None, gr.update(value=None, visible=True), gr.update(value=None, visible=True)
+    return '', gr.update(value=None, interactive=True), None, gr.update(value=None, visible=True), gr.update(value=None,
+                                                                                                             visible=True)
 
 
 def clean_chat_history():
@@ -44,7 +45,9 @@ def clean_chat_history():
     return '', None
 
 
-def submit_message(message):
+def submit_message(message, max_tokens, top_p):
+    args.qa_max_new_tokens = max_tokens
+    args.top_k = top_p
     print(args)
     chat_history, generated_question, source_documents = vchat.chat2video(message)
     global_chat_history.append((message, chat_history[0][1]))
@@ -70,6 +73,7 @@ def download_script_file():
     except Exception as e:
         return f"Error preparing file for download: {str(e)}"
 
+
 def download_sum_file():
     try:
         with open("sum_result.txt", "w") as file:
@@ -77,6 +81,7 @@ def download_sum_file():
         # return "temp_en_log_result.txt"
     except Exception as e:
         return f"Error preparing file for download: {str(e)}"
+
 
 def summary():
     global global_summary
@@ -101,13 +106,7 @@ with gr.Blocks(css=css) as demo:
 
         with gr.Column() as advanced_column:
             max_new_tokens = gr.Slider(label="Max new tokens", minimum=1, maximum=1024, step=1, value=128)
-            # temperature = gr.Slider(label="Temperature", minimum=0.1, maximum=1.0, step=0.1, value=1.0)
-            # top_p = gr.Slider(label="Top-p (nucleus sampling)", minimum=0.05, maximum=1.0, step=0.05, value=0.95)
             top_k = gr.Slider(label="Top-k", minimum=1, maximum=50, step=1, value=3)
-
-
-            args.qa_max_new_tokens = max_new_tokens
-            args.top_k = top_k
 
         with gr.Row():
             with gr.Column():
@@ -135,12 +134,13 @@ with gr.Blocks(css=css) as demo:
     save_sum_btn.click(download_sum_file, [], outputs=[gr.outputs.File(label="Download Summary")])
     save_script_btn.click(download_script_file, [], outputs=[gr.outputs.File(label="Download Script")])
 
-    btn_submit.click(submit_message, [input_message], [input_message, chatbot])
-    input_message.submit(submit_message, [input_message], [input_message, chatbot])
+    btn_submit.click(submit_message, [input_message, max_new_tokens, top_k], [input_message, chatbot])
+    input_message.submit(submit_message, [input_message, max_new_tokens, top_k], [input_message, chatbot])
+
     btn_clean_conversation.click(clean_conversation, [], [input_message, video_inp, chatbot, sum_outp, script_outp])
     btn_clean_chat_history.click(clean_chat_history, [], [input_message, chatbot])
 
     demo.load(queur=False)
 
 demo.queue(concurrency_count=1)
-demo.launch(height='800px', server_port=args.port, debug=True, share=True)
+demo.launch(height='800px', server_port=args.port, debug=True, share=False)
