@@ -6,8 +6,6 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import CharacterTextSplitter
 from bigdl.llm.langchain.embeddings import TransformersEmbeddings
 from langchain import LLMChain
-
-from models.helsinki_model import Translator
 from utils.utils import new_cd
 
 parent_dir = os.path.dirname(__file__)
