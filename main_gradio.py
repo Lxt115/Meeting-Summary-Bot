@@ -69,7 +69,7 @@ def download_script_file():
     try:
         with open("script_result.txt", "w") as file:
             file.write(global_en_log_result)
-        # return "temp_en_log_result.txt"
+        return "script_result.txt"
     except Exception as e:
         return f"Error preparing file for download: {str(e)}"
 
@@ -78,7 +78,7 @@ def download_sum_file():
     try:
         with open("sum_result.txt", "w") as file:
             file.write(global_summary)
-        # return "temp_en_log_result.txt"
+        return "sum_result.txt"
     except Exception as e:
         return f"Error preparing file for download: {str(e)}"
 
@@ -101,7 +101,7 @@ css = """
 with gr.Blocks(css=css) as demo:
     with gr.Column(elem_id="col-container"):
         gr.Markdown("""## 🤖SumMeeting Bot
-                    Powered by BigDL, Llama, Whisper, Helsinki and LangChain/log""",
+                    Powered by BigDL, Llama, Whisper, Helsinki and LangChain""",
                     elem_id="header")
 
         with gr.Column() as advanced_column:
