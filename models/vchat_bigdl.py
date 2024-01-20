@@ -1,6 +1,7 @@
 from models.whisper_model import AudioTranslator
 from models.llm_model import LlmReasoner
 
+
 class VChat:
 
     def __init__(self, args) -> None:
@@ -26,10 +27,10 @@ class VChat:
         en_log_result = "\n\n".join(en_log_result)
         print(f"\033[1;34mLog: \033[0m\n{en_log_result}\n")
 
-        self.llm_reasoner.create_qa_chain(en_log_result)
         return en_log_result
 
-    def chat2video(self, user_input):
+    def chat2video(self, args, user_input, en_log_result):
+        self.llm_reasoner.create_qa_chain(args, en_log_result)
         en_user_input = user_input
 
         print("\n\033[1;32mGnerating response...\033[0m")
