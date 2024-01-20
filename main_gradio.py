@@ -3,7 +3,7 @@ import argparse
 import gradio as gr
 import os
 from models.vchat_bigdl import VChat
-from models.sum_model import Sum
+from models.sum_model0 import Sum
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 parser = argparse.ArgumentParser()
@@ -19,7 +19,6 @@ parser.add_argument("--qa_max_new_tokens", default=128, type=int, help="Number o
 parser.add_argument("--port", type=int, default=8899, help="Gradio server port")
 
 args = parser.parse_args()
-print(args)
 
 vchat = VChat(args)
 sumbot = Sum(args)
@@ -48,8 +47,9 @@ def clean_chat_history():
 def submit_message(message, max_tokens, top_p):
     args.qa_max_new_tokens = max_tokens
     args.top_k = top_p
+
     print(args)
-    chat_history, generated_question, source_documents = vchat.chat2video(message)
+    chat_history, generated_question, source_documents = vchat.chat2video(args, message, global_en_log_result)
     global_chat_history.append((message, chat_history[0][1]))
     return '', global_chat_history
 
@@ -101,7 +101,7 @@ css = """
 with gr.Blocks(css=css) as demo:
     with gr.Column(elem_id="col-container"):
         gr.Markdown("""## 🤖SumMeeting Bot
-                    Powered by BigDL, Llama, Whisper, Helsinki and LangChain""",
+                    Powered by BigDL, Llama, Whisper, and LangChain""",
                     elem_id="header")
 
         with gr.Column() as advanced_column:
