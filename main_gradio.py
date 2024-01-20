@@ -3,7 +3,7 @@ import argparse
 import gradio as gr
 import os
 from models.vchat_bigdl import VChat
-from models.sum_model0 import Sum
+from models.sum_model import Sum
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 parser = argparse.ArgumentParser()
@@ -83,6 +83,19 @@ def download_sum_file():
         return f"Error preparing file for download: {str(e)}"
 
 
+def upload_file(files):
+    file_paths = [file.name for file in files][0]
+    try:
+        with open(file_paths, "r", encoding="utf-8") as file:
+            file_content = file.read()
+            print(file_content)
+    except FileNotFoundError:
+        print("File not found")
+    except IOError:
+        print("Error occurred while reading the file")
+    return file_content
+
+
 def summary():
     global global_summary
     global_summary = sumbot.summarize(global_en_log_result)
@@ -100,9 +113,11 @@ css = """
 
 with gr.Blocks(css=css) as demo:
     with gr.Column(elem_id="col-container"):
-        gr.Markdown("""## 🤖SumMeeting Bot
-                    Powered by BigDL, Llama, Whisper, and LangChain""",
-                    elem_id="header")
+        gr.Markdown(""" ##Meeting Helper Bot
+        Upload meeting recording in mp3/mp4/txt format and you can get the summary and chat based on content  
+        (You can adjust parameters based on your needs)
+        Powered by BigDL, Llama, Whisper, and LangChain""",
+        elem_id="header")
 
         with gr.Column() as advanced_column:
             max_new_tokens = gr.Slider(label="Max new tokens", minimum=1, maximum=1024, step=1, value=128)
@@ -111,12 +126,15 @@ with gr.Blocks(css=css) as demo:
         with gr.Row():
             with gr.Column():
                 video_inp = gr.Video(label="video/mp3_input")
+                # file_inp = gr.File(label="file/doc_input")
+                upload_button = gr.UploadButton("or Click to Upload a File", file_types=["doc", "txt"],
+                                                file_count="multiple")
                 gen_btn = gr.Button("Generate Script")
-                sum_outp = gr.Textbox(label="Summerization output\nPlease be patient", lines=15)
+                sum_outp = gr.Textbox(label="Summerization output", lines=15)
                 save_sum_btn = gr.Button("Save Summarization to txt file")
 
             with gr.Column():
-                script_outp = gr.Textbox(label="Script output\nPlease be patient", lines=30)
+                script_outp = gr.Textbox(label="Script output", lines=30)
                 with gr.Row():
                     script_summarization_btn = gr.Button("Script Summarization ")
                     save_script_btn = gr.Button("Save Script to txt file")
@@ -129,6 +147,7 @@ with gr.Blocks(css=css) as demo:
                 btn_clean_chat_history = gr.Button("Clean Chat History")
                 btn_clean_conversation = gr.Button("Start New Conversation")
 
+    upload_button.upload(upload_file, upload_button, script_outp)
     gen_btn.click(gen_script, [video_inp], [script_outp])
     script_summarization_btn.click(summary, [], [sum_outp])
     save_sum_btn.click(download_sum_file, [], outputs=[gr.outputs.File(label="Download Summary")])
