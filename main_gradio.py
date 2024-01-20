@@ -62,7 +62,8 @@ def gen_script(vid_path):
         gr.update(value=log_text, visible=True)
     else:
         global_en_log_result = vchat.video2log(vid_path)
-        return gr.update(value=global_en_log_result, visible=True)
+        # script_pth = download_script_file()
+        return gr.update(value=global_en_log_result, visible=True), download_script_file()
 
 
 def download_script_file():
@@ -84,11 +85,12 @@ def download_sum_file():
 
 
 def upload_file(files):
+    global global_en_log_result
     file_paths = [file.name for file in files][0]
     try:
         with open(file_paths, "r", encoding="utf-8") as file:
             file_content = file.read()
-            print(file_content)
+            global_en_log_result = file_content
     except FileNotFoundError:
         print("File not found")
     except IOError:
@@ -99,7 +101,7 @@ def upload_file(files):
 def summary():
     global global_summary
     global_summary = sumbot.summarize(global_en_log_result)
-    return gr.update(value=global_summary, visible=True)
+    return gr.update(value=global_summary, visible=True), download_sum_file()
 
 
 css = """
@@ -113,11 +115,11 @@ css = """
 
 with gr.Blocks(css=css) as demo:
     with gr.Column(elem_id="col-container"):
-        gr.Markdown(""" ##Meeting Helper Bot
+        gr.Markdown(""" ## Meeting Helper Bot
         Upload meeting recording in mp3/mp4/txt format and you can get the summary and chat based on content  
         (You can adjust parameters based on your needs)
         Powered by BigDL, Llama, Whisper, and LangChain""",
-        elem_id="header")
+                    elem_id="header")
 
         with gr.Column() as advanced_column:
             max_new_tokens = gr.Slider(label="Max new tokens", minimum=1, maximum=1024, step=1, value=128)
@@ -125,19 +127,24 @@ with gr.Blocks(css=css) as demo:
 
         with gr.Row():
             with gr.Column():
-                video_inp = gr.Video(label="video/mp3_input")
+                video_inp = gr.Video(label="1.Upload MP3/MP4 File")
                 # file_inp = gr.File(label="file/doc_input")
-                upload_button = gr.UploadButton("or Click to Upload a File", file_types=["doc", "txt"],
+                upload_button = gr.UploadButton("1. Or Click to Upload a txt File", file_types=["doc", "txt"],
                                                 file_count="multiple")
-                gen_btn = gr.Button("Generate Script")
+                gen_btn = gr.Button("2. Generate Script")
                 sum_outp = gr.Textbox(label="Summerization output", lines=15)
-                save_sum_btn = gr.Button("Save Summarization to txt file")
+                # save_sum_btn = gr.Button("Save Summarization to txt file")
+                save_sum_dl = gr.outputs.File(label="Download Summary")
+                # save_sum_btn.click(download_sum_file, [], outputs=[gr.outputs.File(label="Download Summary")])
 
             with gr.Column():
                 script_outp = gr.Textbox(label="Script output", lines=30)
                 with gr.Row():
-                    script_summarization_btn = gr.Button("Script Summarization ")
-                    save_script_btn = gr.Button("Save Script to txt file")
+                    script_summarization_btn = gr.Button("3.Script Summarization ")
+                    # save_script_btn = gr.Button("Save Script to txt file")
+
+                save_script_dl = gr.outputs.File(label="Download Script")
+                # save_script_btn.click(download_script_file, [], outputs=[gr.outputs.File(label="Download Script")])
 
         with gr.Column():
             chatbot = gr.Chatbot(elem_id="chatbox")
@@ -148,10 +155,9 @@ with gr.Blocks(css=css) as demo:
                 btn_clean_conversation = gr.Button("Start New Conversation")
 
     upload_button.upload(upload_file, upload_button, script_outp)
-    gen_btn.click(gen_script, [video_inp], [script_outp])
-    script_summarization_btn.click(summary, [], [sum_outp])
-    save_sum_btn.click(download_sum_file, [], outputs=[gr.outputs.File(label="Download Summary")])
-    save_script_btn.click(download_script_file, [], outputs=[gr.outputs.File(label="Download Script")])
+
+    gen_btn.click(gen_script, [video_inp], [script_outp, save_script_dl])
+    script_summarization_btn.click(summary, [], [sum_outp, save_sum_dl])
 
     btn_submit.click(submit_message, [input_message, max_new_tokens, top_k], [input_message, chatbot])
     input_message.submit(submit_message, [input_message, max_new_tokens, top_k], [input_message, chatbot])
