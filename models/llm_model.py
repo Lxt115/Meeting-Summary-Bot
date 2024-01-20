@@ -3,7 +3,7 @@ from langchain.chains import ConversationalRetrievalChain, StuffDocumentsChain
 from langchain.prompts import PromptTemplate
 from bigdl.llm.langchain.llms import TransformersLLM
 from langchain.vectorstores import FAISS
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from bigdl.llm.langchain.embeddings import TransformersEmbeddings
 from langchain import LLMChain
 from utils.utils import new_cd
@@ -69,7 +69,8 @@ class LlmReasoner():
         self.doc_chain = StuffDocumentsChain(llm_chain=self.answer_generator, document_prompt=DOC_PROMPT,
                                              document_variable_name='context')
         # 拆分查看字符的文本, 创建一个新的文本分割器
-        self.text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0, keep_separator=True)
+        # self.text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0, keep_separator=True)
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=2048, chunk_overlap=0)
         texts = self.text_splitter.split_text(input_log)
         self.vectorstore = FAISS.from_texts(texts, self.embeddings,
                                             metadatas=[{"video_clip": str(i)} for i in range(len(texts))])
