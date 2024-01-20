@@ -13,6 +13,10 @@ parent_dir = os.path.dirname(__file__)
 condense_template = """
 Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
 You can assume the discussion is about the video content.
+REMEMBER: If there is no relevant information within the context, just say "Hmm, I'm \
+not sure." Don't try to make up an answer. Anything between the preceding 'context' \
+html blocks is retrieved from a knowledge bank, not part of the conversation with the \
+user.
 Chat History:
 {chat_history}
 Follow Up Question: {question}
@@ -50,10 +54,15 @@ class LlmReasoner():
 
     def init_model(self):
         with new_cd(parent_dir):
-            self.llm = TransformersLLM.from_model_id_low_bit(f"D:\\Mcs\\5014\\llm\\models\\{self.llm_version}")
+            self.llm = TransformersLLM.from_model_id_low_bit(
+                f"D:\\Mcs\\5014\\VChat-BigDL\\checkpoint\\{self.llm_version}")
             self.llm.streaming = False
             self.embeddings = TransformersEmbeddings.from_model_id(
-                model_id=f"D:\\Mcs\\5014\\llm\\models\\{self.embed_version}")
+                model_id=f"D:\\Mcs\\5014\\VChat-BigDL\\checkpoint\\{self.embed_version}")
+
+    def create_qa_chain(self, args, input_log):
+        self.top_k = args.top_k
+        self.qa_max_new_tokens = args.qa_max_new_tokens
         self.question_generator = LLMChain(llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT)
         self.answer_generator = LLMChain(llm=self.llm, prompt=QA_PROMPT,
                                          llm_kwargs={"max_new_tokens": self.qa_max_new_tokens})
@@ -61,8 +70,6 @@ class LlmReasoner():
                                              document_variable_name='context')
         # 拆分查看字符的文本, 创建一个新的文本分割器
         self.text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0, keep_separator=True)
-
-    def create_qa_chain(self, input_log):
         texts = self.text_splitter.split_text(input_log)
         self.vectorstore = FAISS.from_texts(texts, self.embeddings,
                                             metadatas=[{"video_clip": str(i)} for i in range(len(texts))])
