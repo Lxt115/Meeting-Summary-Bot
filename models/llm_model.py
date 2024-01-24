@@ -14,9 +14,7 @@ condense_template = """
 Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
 You can assume the discussion is about the video content.
 REMEMBER: If there is no relevant information within the context, just say "Hmm, I'm \
-not sure." Don't try to make up an answer. Anything between the preceding 'context' \
-html blocks is retrieved from a knowledge bank, not part of the conversation with the \
-user.
+not sure." Don't try to make up an answer. \
 Chat History:
 {chat_history}
 Follow Up Question: {question}
@@ -55,10 +53,10 @@ class LlmReasoner():
     def init_model(self):
         with new_cd(parent_dir):
             self.llm = TransformersLLM.from_model_id_low_bit(
-                f"D:\\Mcs\\5014\\VChat-BigDL\\checkpoint\\{self.llm_version}")
+                f"D:\\Mcs\\5014\\MeetingSumBot-BigDL\\checkpoint\\{self.llm_version}")
             self.llm.streaming = False
             self.embeddings = TransformersEmbeddings.from_model_id(
-                model_id=f"D:\\Mcs\\5014\\VChat-BigDL\\checkpoint\\{self.embed_version}")
+                model_id=f"D:\\Mcs\\5014\\MeetingSumBot-BigDL\\checkpoint\\{self.embed_version}")
 
     def create_qa_chain(self, args, input_log):
         self.top_k = args.top_k
