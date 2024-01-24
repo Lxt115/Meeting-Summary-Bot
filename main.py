@@ -2,7 +2,7 @@
 import argparse
 import gradio as gr
 import os
-from models.vchat_bigdl import VChat
+from models.helperbot_bigdl import Chat
 from models.sum_model import Sum
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -16,22 +16,23 @@ parser.add_argument("--embed_version", default="all-MiniLM-L12-v2", help="Embedd
 parser.add_argument("--top_k", default=3, type=int, help="Return top k relevant contexts to llm")
 parser.add_argument("--qa_max_new_tokens", default=128, type=int, help="Number of max new tokens for llm")
 # general arguments
-parser.add_argument("--port", type=int, default=8899, help="Gradio server port")
+parser.add_argument("--port", type=int, default=7860, help="Gradio server port")
 
 args = parser.parse_args()
 
-vchat = VChat(args)
+chat = Chat(args)
 sumbot = Sum(args)
-vchat.init_model()
+chat.init_model()
 
 global_chat_history = []
-global_en_log_result = ""
+global_result = ""
+
 global_summary = ""
 
 
 def clean_conversation():
     global global_chat_history
-    vchat.clean_history()
+    chat.clean_history()
     global_chat_history = []
     return '', gr.update(value=None, interactive=True), None, gr.update(value=None, visible=True), gr.update(value=None,
                                                                                                              visible=True)
@@ -39,7 +40,7 @@ def clean_conversation():
 
 def clean_chat_history():
     global global_chat_history
-    vchat.clean_history()
+    chat.clean_history()
     global_chat_history = []
     return '', None
 
@@ -49,27 +50,27 @@ def submit_message(message, max_tokens, top_p):
     args.top_k = top_p
 
     print(args)
-    chat_history, generated_question, source_documents = vchat.chat2video(args, message, global_en_log_result)
+    chat_history, generated_question, source_documents = chat.chat2video(args, message, global_result)
     global_chat_history.append((message, chat_history[0][1]))
     return '', global_chat_history
 
 
 def gen_script(vid_path):
     print(vid_path)
-    global global_en_log_result
+    global global_result
     if vid_path is None:
         log_text = "===== Please upload video! ====="
         gr.update(value=log_text, visible=True)
     else:
-        global_en_log_result = vchat.video2log(vid_path)
+        global_result = chat.video2log(vid_path)
         # script_pth = download_script_file()
-        return gr.update(value=global_en_log_result, visible=True), download_script_file()
+        return gr.update(value=global_result, visible=True), download_script_file()
 
 
 def download_script_file():
     try:
         with open("script_result.txt", "w") as file:
-            file.write(global_en_log_result)
+            file.write(global_result)
         return "script_result.txt"
     except Exception as e:
         return f"Error preparing file for download: {str(e)}"
@@ -85,22 +86,22 @@ def download_sum_file():
 
 
 def upload_file(files):
-    global global_en_log_result
+    global global_result
     file_paths = [file.name for file in files][0]
     try:
         with open(file_paths, "r", encoding="utf-8") as file:
             file_content = file.read()
-            global_en_log_result = file_content
+            global_result = file_content
     except FileNotFoundError:
         print("File not found")
     except IOError:
         print("Error occurred while reading the file")
-    return file_content
+    return file_content, download_script_file()
 
 
 def summary():
     global global_summary
-    global_summary = sumbot.summarize(global_en_log_result)
+    global_summary = sumbot.summarize(global_result)
     return gr.update(value=global_summary, visible=True), download_sum_file()
 
 
@@ -154,7 +155,7 @@ with gr.Blocks(css=css) as demo:
                 btn_clean_chat_history = gr.Button("Clean Chat History")
                 btn_clean_conversation = gr.Button("Start New Conversation")
 
-    upload_button.upload(upload_file, upload_button, script_outp)
+    upload_button.upload(upload_file, upload_button, [script_outp, save_script_dl])
 
     gen_btn.click(gen_script, [video_inp], [script_outp, save_script_dl])
     script_summarization_btn.click(summary, [], [sum_outp, save_sum_dl])
