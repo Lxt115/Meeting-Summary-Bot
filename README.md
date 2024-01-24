@@ -1,6 +1,6 @@
 # Meeting-Helper-Bot|会议助手
 > Building LLM applications using BigDL-LLM： A Meeting Summary & Rag-based Chat Bot
-Powered by BigDL, Llama, Whisper, Helsinki and LangChain
+Powered by BigDL, Llama, Whisper and LangChain
 
 
 ## Pipeline
