@@ -1,5 +1,6 @@
 # Meeting-Helper-Bot|会议助手
 > Building LLM applications using BigDL-LLM
+
 A Meeting Summary & Rag-based Chat Bot
 
 ## Pipeline
@@ -35,5 +36,5 @@ python main.py
 
 ## Acknowledge
 
-This project refers to [VChat-BigDL](https://github.com/Kailuo-Lai/VChat-BigDL), [Whisper](https://github.com/openai/whisper)
-Powered by [BigDL](https://github.com/intel-analytics/BigDL), , [Llama2](https://github.com/facebookresearch/llama),[LangChian](https://github.com/langchain-ai/langchain)
+This project refers to [VChat-BigDL](https://github.com/Kailuo-Lai/VChat-BigDL)
+Powered by [BigDL](https://github.com/intel-analytics/BigDL), [Whisper](https://github.com/openai/whisper) , [Llama2](https://github.com/facebookresearch/llama),[LangChian](https://github.com/langchain-ai/langchain)
