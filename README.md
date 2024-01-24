@@ -7,7 +7,7 @@ Powered by BigDL, Llama, Whisper, Helsinki and LangChain
 ![image](https://github.com/Lxt115/Meeting-Summary-Bot/assets/67227722/03ce0f86-e793-4723-adf9-088aae4c6efd)
 
 ## Demo
-|[English](data/demo/demo2.mp4)|[Chinese](data/demo/demo1.mp4)|
+|[MP3](demo/demo_mp3.mp4)|[TXT](demo/demo_txt.mp4)|
 |:-:|:-:|
 
 ## Getting Started 
