@@ -2,7 +2,7 @@ from models.whisper_model import AudioTranslator
 from models.llm_model import LlmReasoner
 
 
-class VChat:
+class Chat:
 
     def __init__(self, args) -> None:
         self.args = args
