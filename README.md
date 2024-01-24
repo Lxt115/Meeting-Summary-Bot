@@ -22,7 +22,7 @@ conda install -c conda-forge ffmpeg -y
 ```
 3. Download Model
 ```
-python download_ckpt.py
+python download.py
 ```
 4. Optimaize LLM by BigDL-LLM
 ```
