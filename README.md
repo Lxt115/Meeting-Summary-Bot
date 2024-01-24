@@ -1,65 +1,38 @@
-# Meeting-Helper-Bot
+![image](https://github.com/Lxt115/Meeting-Summary-Bot/assets/67227722/1b523680-5e25-45f2-9aa6-8b3b54a459ac)# Meeting-Helper-Bot|会议助手
 > Building LLM applications using BigDL-LLM： A Meeting Summary & Rag-based Chat Bot
 Powered by BigDL, Llama, Whisper, Helsinki and LangChain
 
 Reference repo：https://github.com/Kailuo-Lai/VChat-BigDL
-## Getting Started 使用指南
 
-项目使用条件、如何安装部署、怎样运行使用以及使用演示
+## Pipeline
+![image](https://github.com/Lxt115/Meeting-Summary-Bot/assets/67227722/03ce0f86-e793-4723-adf9-088aae4c6efd)
 
-### Prerequisites 项目使用条件
+## Demo
 
-你需要安装什么软件以及如何去安装它们。
-
+## Getting Started 
+1. Create Conda Environment
 ```
-Give examples
+conda  create -n vchat python=3.9 -y
+activate vchat
+pip install -r ./requirements.txt
+```
+2. Install FFmpeg
+```
+conda install -c conda-forge ffmpeg -y
+```
+3. Download Model
+```
+python download_ckpt.py
+```
+4. Optimaize LLM by BigDL-LLM
+```
+python LLM_low_bit_optimize.py
+```
+5. Run main.py
+```
+python main.py
 ```
 
-### Installation 安装
+## Acknowledge
 
-通过一步步实例告诉你如何安装部署、怎样运行使用。
-
-OS X & Linux:
-
-```sh
-Give the example
-```
-
-Windows:
-
-```sh
-Give the example
-```
-
-### Usage example 使用示例
-
-给出更多使用演示和截图，并贴出相应代码。
-
-## Deployment 部署方法
-
-部署到生产环境注意事项。
-
-## Contributing 贡献指南
-
-Please read [CONTRIBUTING.md](#) for details on our code of conduct, and the process for submitting pull requests to us.
-
-清阅读 [CONTRIBUTING.md](#) 了解如何向这个项目贡献代码
-
-## Release History 版本历史
-
-* 0.2.1
-    * CHANGE: Update docs
-* 0.2.0
-    * CHANGE: Remove `README.md`
-* 0.1.0
-    * Work in progress
-
-## Authors 关于作者
-
-* **WangYan** - *Initial work* - [WangYan](https://wangyan.org)
-
-查看更多关于这个项目的贡献者，请阅读 [contributors](#) 
-
-## License 授权协议
-
-这个项目 MIT 协议， 请点击 [LICENSE.md](LICENSE.md) 了解更多细节。
+This project is based on [BigDL](https://github.com/intel-analytics/BigDL), [VChat-BigDL](https://github.com/Kailuo-Lai/VChat-BigDL), [Whisper](https://github.com/openai/whisper), [Llama2](https://github.com/facebookresearch/llama),[LangChian](https://github.com/langchain-ai/langchain)
