@@ -1,4 +1,4 @@
-from bigdl.llm.langchain.llms import TransformersLLM
+from ipex_llm.langchain.llms import TransformersLLM
 from langchain import LLMChain
 from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
