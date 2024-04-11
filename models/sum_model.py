@@ -96,9 +96,9 @@ class Sum():
         )
 
         result = map_reduce_chain({"input_documents": text}, return_only_outputs=True)
-        print("-." * 40)
-        print(result)
-        # print(map_reduce_chain.run(docs))
+        # print("-." * 40)
+        # print(result)
+        result = result['output_text'].split("Helpful Answer:").strip()[-1]
         return result
 
     def summarize(self, script):
