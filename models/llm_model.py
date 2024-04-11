@@ -1,10 +1,10 @@
 import os
 from langchain.chains import ConversationalRetrievalChain, StuffDocumentsChain
 from langchain.prompts import PromptTemplate
-from bigdl.llm.langchain.llms import TransformersLLM
+from ipex_llm.langchain.llms import TransformersLLM
 from langchain.vectorstores import FAISS
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
-from bigdl.llm.langchain.embeddings import TransformersEmbeddings
+from ipex_llm.langchain.embeddings import TransformersEmbeddings
 from langchain import LLMChain
 from utils.utils import new_cd
 
