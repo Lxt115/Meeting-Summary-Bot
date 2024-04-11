@@ -1,5 +1,5 @@
 import whisper
-from bigdl.llm import optimize_model
+from ipex_llm import optimize_model
 
 def has_intersection(t1, t2):
     if t1[1] < t2[0] or t2[1] < t1[0]:
