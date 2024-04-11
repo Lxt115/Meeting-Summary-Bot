@@ -17,13 +17,12 @@ class Sum():
         text_splitter = CharacterTextSplitter(chunk_size=1024, separator="\n", chunk_overlap=0)
         texts = text_splitter.split_text(script)
         docs = [Document(page_content=t) for t in texts]
-        llm = TransformersLLM.from_model_id_low_bit(f"D:\\Mcs\\5014\\VChat-BigDL\\checkpoint\\{self.llm_version}")
+        llm = TransformersLLM.from_model_id_low_bit(f"checkpoint\\{self.llm_version}")
 
         prompt_template = """Write a concise summary of the following:
         {text}
         CONCISE SUMMARY:"""
         prompt = PromptTemplate.from_template(prompt_template)
-
         refine_template = (
             "Your job is to produce a final summary\n"
             "We have provided an existing summary up to a certain point: {existing_answer}\n"
@@ -53,7 +52,7 @@ class Sum():
         texts = text_splitter.split_text(script)
         text = [Document(page_content=t) for t in texts]
 
-        llm = TransformersLLM.from_model_id_low_bit(f"D:\\Mcs\\5014\\VChat-BigDL\\checkpoint\\{self.llm_version}")
+        llm = TransformersLLM.from_model_id_low_bit(f"checkpoint\\{self.llm_version}")
 
         # Map
         map_template = """The following is a meeting recording
@@ -123,7 +122,7 @@ class Sum():
             print("\n")
 
         llm = TransformersLLM.from_model_id_low_bit(
-            f"D:\\Mcs\\5014\\MeetingSumBot-BigDL\\checkpoint\\{self.llm_version}")
+            f"checkpoint\\{self.llm_version}")
         sum_split = []
 
         for text in texts:

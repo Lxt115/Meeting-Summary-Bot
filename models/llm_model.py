@@ -53,10 +53,10 @@ class LlmReasoner():
     def init_model(self):
         with new_cd(parent_dir):
             self.llm = TransformersLLM.from_model_id_low_bit(
-                f"D:\\Mcs\\5014\\MeetingSumBot-BigDL\\checkpoint\\{self.llm_version}")
+                f"..\\checkpoints\\{self.llm_version}")
             self.llm.streaming = False
             self.embeddings = TransformersEmbeddings.from_model_id(
-                model_id=f"D:\\Mcs\\5014\\MeetingSumBot-BigDL\\checkpoint\\{self.embed_version}")
+                model_id=f"..\\checkpoints\\{self.embed_version}")
 
     def create_qa_chain(self, args, input_log):
         self.top_k = args.top_k

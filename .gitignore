@@ -1,0 +1,4 @@
+checkpoints
+models/__pycache__
+utils/__pycache__
+download.py
